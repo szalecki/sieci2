@@ -1,0 +1,12 @@
+{
+    "cards": [
+      {
+        "id": 1,
+        "symbols": ["apple", "banana", "cat", "dog", "fish", "house", "star", "sun"]
+      },
+      {
+        "id": 2,
+        "symbols": ["apple", "cloud", "fish", "moon", "star", "sun", "tree", "wolf"]
+      }
+    ]
+  }
