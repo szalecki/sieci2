@@ -1,12 +1,17 @@
 {
-    "cards": [
-      {
-        "id": 1,
-        "symbols": ["apple", "banana", "cat", "dog", "fish", "house", "star", "sun"]
-      },
-      {
-        "id": 2,
-        "symbols": ["apple", "cloud", "fish", "moon", "star", "sun", "tree", "wolf"]
-      }
-    ]
-  }
+  "cards": [
+    { "id": 1, "symbols": ["heart", "triangle", "square", "lightning"] },
+    { "id": 2, "symbols": ["heart", "circle", "fish", "cat"] },
+    { "id": 3, "symbols": ["heart", "car", "screw", "boat"] },
+    { "id": 4, "symbols": ["heart", "cloud", "sun", "moon"] },
+    { "id": 5, "symbols": ["triangle", "circle", "car", "cloud"] },
+    { "id": 6, "symbols": ["triangle", "fish", "screw", "sun"] },
+    { "id": 7, "symbols": ["triangle", "cat", "boat", "moon"] },
+    { "id": 8, "symbols": ["square", "circle", "screw", "moon"] },
+    { "id": 9, "symbols": ["square", "fish", "boat", "cloud"] },
+    { "id": 10, "symbols": ["square", "cat", "car", "sun"] },
+    { "id": 11, "symbols": ["lightning", "circle", "boat", "sun"] },
+    { "id": 12, "symbols": ["lightning", "fish", "car", "moon"] },
+    { "id": 13, "symbols": ["lightning", "cat", "screw", "cloud"] }
+  ]
+}
