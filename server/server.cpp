@@ -12,6 +12,9 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include "json/include/nlohmann/json.hpp"
+#include <random>
+
+
 
 #define PORT 8080
 
@@ -23,6 +26,7 @@ struct GameMessage {
     int cardID;
     char chosenSymbol[50];
     char cardSymbols[8][50];
+    bool isThisMyCard;
 };
 
 // Struktura karty
@@ -82,17 +86,30 @@ Card drawCard() {
     return drawnCard;
 }
 
+//tasowanie
+void shuffleCards() {
+    std::random_device rd;                            // Random device for seeding
+    std::mt19937 g(rd());                             // Mersenne Twister generator
+    std::shuffle(cards.begin(), cards.end(), g);      // Shuffle the cards vector
+    std::cout << "Karty zostały potasowane." << std::endl;
+}
+
+// Funkcja startująca grę
 // Funkcja startująca grę
 void startGame() {
     {
         std::lock_guard<std::mutex> lock(gameMutex);
+        shuffleCards();
         tableCard = drawCard();  // Inicjalna karta na stole
         gameStarted = true;
     }
 
+    
+
     // Rozesłanie kart początkowych do graczy
     for (int clientSocket : clientSockets) {
         GameMessage message;
+        message.isThisMyCard=true;
         Card playerCard = drawCard();
         playerCards[clientSocket] = playerCard;
 
@@ -103,11 +120,21 @@ void startGame() {
             message.cardSymbols[i][sizeof(message.cardSymbols[i]) - 1] = '\0';
         }
 
+        // Wyślij kartę do gracza
         send(clientSocket, &message, sizeof(message), 0);
+
+        // Wypisz informację o wysłanej karcie do konsoli
+        std::cout << "Wysłano kartę do gracza na socket " << clientSocket << ": ";
+        std::cout << "ID karty: " << playerCard.id << ", Symbole: ";
+        for (const auto& symbol : playerCard.symbols) {
+            std::cout << symbol << " ";
+        }
+        std::cout << std::endl;
     }
 
     // Wysłanie karty na stole do wszystkich graczy
     GameMessage tableMessage;
+    tableMessage.isThisMyCard=false;
     for (size_t i = 0; i < tableCard.symbols.size(); ++i) {
         strncpy(tableMessage.cardSymbols[i], tableCard.symbols[i].c_str(), sizeof(tableMessage.cardSymbols[i]) - 1);
         tableMessage.cardSymbols[i][sizeof(tableMessage.cardSymbols[i]) - 1] = '\0';
@@ -118,8 +145,17 @@ void startGame() {
         send(clientSocket, &tableMessage, sizeof(tableMessage), 0);
     }
 
+    // Wypisz informację o karcie na stole do konsoli
+    std::cout << "Karta na stole: ";
+    std::cout << "ID karty: " << tableCard.id << ", Symbole: ";
+    for (const auto& symbol : tableCard.symbols) {
+        std::cout << symbol << " ";
+    }
+    std::cout << std::endl;
+
     std::cout << "Gra rozpoczęta!" << std::endl;
 }
+
 
 // Funkcja obsługująca połączenie z klientem
 void handleClient(int clientSocket) {
@@ -176,12 +212,15 @@ void handleClient(int clientSocket) {
                     tableCard = drawCard();
 
                     std::cout << "Gracz " << playerName << " zdobył punkt! Nowa karta na stole." << std::endl;
+
+                    
                 }
             }
 
             // Wysłanie aktualizacji do gracza
             if (match) {
                 message.cardID = playerCards[clientSocket].id;
+                message.isThisMyCard=true;
                 for (size_t i = 0; i < playerCards[clientSocket].symbols.size(); ++i) {
                     strncpy(message.cardSymbols[i], playerCards[clientSocket].symbols[i].c_str(), sizeof(message.cardSymbols[i]) - 1);
                     message.cardSymbols[i][sizeof(message.cardSymbols[i]) - 1] = '\0';
@@ -191,6 +230,7 @@ void handleClient(int clientSocket) {
 
             // Wysłanie karty na stole do wszystkich graczy po każdej turze
             GameMessage tableMessage;
+            tableMessage.isThisMyCard=false;
             for (size_t i = 0; i < tableCard.symbols.size(); ++i) {
                 strncpy(tableMessage.cardSymbols[i], tableCard.symbols[i].c_str(), sizeof(tableMessage.cardSymbols[i]) - 1);
                 tableMessage.cardSymbols[i][sizeof(tableMessage.cardSymbols[i]) - 1] = '\0';
