@@ -94,7 +94,11 @@ void shuffleCards() {
     std::cout << "Karty zostały potasowane." << std::endl;
 }
 
-// Funkcja startująca grę
+
+
+
+// Funkcja konca grę
+
 // Funkcja startująca grę
 void startGame() {
     {
