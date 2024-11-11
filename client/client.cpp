@@ -17,6 +17,7 @@ struct GameMessage {
     int cardID;
     char chosenSymbol[50];
     char cardSymbols[8][50];
+    bool isThisMyCard;
 };
 
 // Funkcja do odbierania wiadomości od serwera
@@ -30,11 +31,21 @@ void receiveMessages(int clientSocket) {
         }
 
         // Wyświetlenie otrzymanej karty od serwera
-        std::cout << "Otrzymano nową kartę na ręce (ID: " << message.cardID << "): ";
-        for (int i = 0; i < 8 && strlen(message.cardSymbols[i]) > 0; ++i) {
+        if(message.isThisMyCard==true){
+        std::cout << "Otrzymano nową kartę na ręce ";
+        for (int i = 0; i < 4 && strlen(message.cardSymbols[i]) > 0; ++i) {
             std::cout << message.cardSymbols[i] << " ";
         }
         std::cout << std::endl;
+        }
+        else
+        {
+        std::cout << "Karta na stole ";
+        for (int i = 0; i < 4 && strlen(message.cardSymbols[i]) > 0; ++i) {
+            std::cout << message.cardSymbols[i] << " ";
+        }
+        std::cout << std::endl;
+        }
     }
 }
 
